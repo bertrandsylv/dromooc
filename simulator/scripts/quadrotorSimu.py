@@ -7,9 +7,8 @@
 
 import rospy
 import tf
-from geometry_msgs.msg import Quaternion
+from geometry_msgs.msg import Quaternion, Wrench
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Wrench
 import quadrotorClass
 
 
@@ -124,7 +123,7 @@ if __name__ == '__main__':
         # msgs publications
         pubOdometry.publish(odomMsg)
          
-         
+
 
         integrationRate.sleep()
 
