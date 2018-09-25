@@ -68,7 +68,7 @@ def callBackWrench(data):
    
 # subscribers
 # ------------
-rospy.Subscriber("wrench", Wrench, callBackWrench)
+rospy.Subscriber("inputWrench", Wrench, callBackWrench)
 
 
 

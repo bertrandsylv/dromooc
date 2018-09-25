@@ -35,20 +35,45 @@ class Quadrotor:
         self.omega3 = 0.0
         self.omega4 = 0.0
         
-        # parameters
-        ''' completer avec bonnes valeurs '''
+        # parameters  
+        '''
+        inertia and aerodynamic coeffs. taken from
+        L.Derafa et al., 
+        "Dynamic modeling and experimental identification of four rotors helicopter parameters", 
+        IEEE ICIT 2006
+        '''
         self.g0 = 9.81
-        self.m = 2.5        # mass
+        self.m = 0.800        # mass
         self.J = np.eye(3)  # inertia matrix
-        self.l = .30        # arm length
-        self.b = 0.5        # aerodynamic coefficient
-        self.d = 0.5        # aerodynamic coefficient
+        self.J[0][0] = 3.8E-3
+        self.J[1][1] = 3.8E-3
+        self.J[2][2] = 7.1E-3
+        self.Jinv = np.linalg.inv(self.J)
+        self.l = .20        # arm length
+        self.b = 2.98E-5        # aerodynamic coefficient related to rotor lift
+        self.d = 3.23E-7        # aerodynamic coefficient related to rotor drag
+        
+        
+        # motor speed to thrust and torques allocation matrix  [T, Gamma^t]^t = B. [wi^2]
+        self.B = np.array([[self.b,          self.b, self.b,         self.b],
+                      [-self.l*self.b,  0.,     self.l*self.b,  0.],
+                      [0.,      -self.l*self.b, 0., self.l*self.b],
+                      [self.d,  -self.d,    self.d,  -self.d] ])                      
+        self.Binv = np.linalg.inv(self.B)
 
     
 
 
-    def stateUpdateFromInput(self, inputVector, inputType = 'MotorSpeeds', Ts=0.001):
+    def stateUpdateFromInput(self, inputVector, inputType = 'ThrustAndTorques', Ts=0.001):
     # inputType : 'motorSpeed', 'thrustAndTorques'
+    
+        ''' A METTRE EN ENTREE '''
+        # perturbation force in inertial frame
+        Fext = np.array([[0.],[0.],[0.]])
+        
+        
+
+        
         
         if (inputType == 'MotorSpeeds'):
             # motor speeds            
@@ -57,13 +82,17 @@ class Quadrotor:
             self.omega3 = inputVector[2]
             self.omega4 = inputVector[3]
             
+            
+            ''' a reprendre en forme matricielle '''
             # thrust
             T = self.b * (self.omega1**2+ self.omega2**2 + self.omega3**2 + self.omega4**2)
     
             # torque (in body frame)        
-            Gamma1 = self.l * self.b * (-self.omega2**2 + self.omega4**2)
-            Gamma2 = self.l * self.b * (self.omega1**2 - self.omega3**2)
+            Gamma1 = self.l * self.b * (self.omega3**2 - self.omega1**2)
+            Gamma2 = self.l * self.b * (self.omega4**2 - self.omega2**2)
             Gamma3 = self.d * (self.omega1**2 - self.omega2**2 + self.omega3**2 - self.omega4**2)
+        
+        
         
         elif (inputType == 'ThrustAndTorques'):   
             # thrust
@@ -75,12 +104,11 @@ class Quadrotor:
             Gamma3 = inputVector[3]
 
             # motor speeds
-            '''    A COMPLETER
-            self.omega1 = 
-            self.omega2 = 
-            self.omega3 = 
-            self.omega4 = 
-            '''
+            omegaSquare = np.dot( self.Binv, np.array([[T],[Gamma1], [Gamma2], [Gamma3]]))
+            self.omega1 = np.sqrt(omegaSquare[0])
+            self.omega2 = np.sqrt(omegaSquare[1])
+            self.omega3 = np.sqrt(omegaSquare[2])
+            self.omega4 = np.sqrt(omegaSquare[3])
 
         Gamma = np.array([[Gamma1], [Gamma2], [Gamma3]])
 
@@ -108,11 +136,16 @@ class Quadrotor:
         OmegaX = np.array([ [0, -self.Omega_r, self.Omega_q],
                             [self.Omega_r, 0, -self.Omega_p],
                             [-self.Omega_q, self.Omega_p, 0] ])
+              
+                      
+        # !!!!! z-axis direct upwards !!!!!            
+        e3 =  np.array([[0.],[0.],[1.]])                           
+
                             
         # linear acceleration
-        Acc = np.array([[0.],[0.],[self.g0]]) - (T/self.m)*np.dot(R,np.array([[0.],[0.],[1.]])) 
-        # !!!!! z vers le bas !!!!!        
-        # PREVOIR FORCE DE PERTURBATION        
+        Acc = -self.g0*e3 + (T/self.m)*np.dot(R,e3)  + (Fext / self.m)
+
+        OmegaxJOmega = np.cross(Omega.T, np.dot(self.J, Omega).T).T
         
         
         # translationnal dynamics
@@ -121,7 +154,7 @@ class Quadrotor:
         
         # orientation dynamics
         R += Ts*np.dot(R, OmegaX)
-        Omega += Ts*(-np.cross(Omega.T, np.dot(self.J, Omega).T).T + Gamma )       
+        Omega += Ts*( np.dot(self.Jinv, -OmegaxJOmega + Gamma) )
         
         
         # data update
