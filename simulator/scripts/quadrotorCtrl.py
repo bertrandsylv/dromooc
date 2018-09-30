@@ -12,7 +12,6 @@ from nav_msgs.msg import Odometry
 import numpy as np
 
 
-
 # node init
 rospy.init_node('quadrotorCtrl', anonymous=False)
 

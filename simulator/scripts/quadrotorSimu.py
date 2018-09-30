@@ -7,8 +7,9 @@
 
 import rospy
 import tf
-from geometry_msgs.msg import Quaternion, Wrench
+from geometry_msgs.msg import Quaternion#, Wrench
 from nav_msgs.msg import Odometry
+from simulator.msg import Thrust, Torque, MotorSpeeds, RPYAngles
 import quadrotorClass
 
 
@@ -29,11 +30,11 @@ Gamma3 = 0.
 # -----------
 # odometry
 pubOdometry = rospy.Publisher('/odom', Odometry, queue_size=50)
-
+pubRPYAngles = rospy.Publisher('RPYAngles', RPYAngles, queue_size=50 )
 
 
 # frequency of integration
-fint = 1000.
+fint = 100.
 Tint = 1./fint
 integrationRate = rospy.Rate(fint)
 
@@ -53,6 +54,28 @@ inputMode = 'ThrustAndTorques'  # 'MotorSpeeds"
 
 
 # -----------------------------------------------------------------------------
+def callBackThrust(data):
+# -----------------------------------------------------------------------------
+    global T
+    
+    T = data.thrust
+# -----------------------------------------------------------------------------        
+
+
+# -----------------------------------------------------------------------------
+def callBackTorque(data):
+# -----------------------------------------------------------------------------
+    global Gamma1, Gamma2, Gamma3
+    
+    Gamma1 = data.torque.x
+    Gamma2 = data.torque.y
+    Gamma3 = data.torque.z
+            
+# -----------------------------------------------------------------------------        
+
+
+'''
+# -----------------------------------------------------------------------------
 def callBackWrench(data):
 # -----------------------------------------------------------------------------
     global T, Gamma1, Gamma2, Gamma3
@@ -63,11 +86,13 @@ def callBackWrench(data):
     Gamma3 = data.torque.z
             
 # -----------------------------------------------------------------------------        
-        
+'''        
    
 # subscribers
 # ------------
-rospy.Subscriber("inputWrench", Wrench, callBackWrench)
+#rospy.Subscriber("inputWrench", Wrench, callBackWrench)
+rospy.Subscriber("thrust", Thrust, callBackThrust)
+rospy.Subscriber("torque", Torque, callBackTorque)
 
 
 
@@ -83,6 +108,8 @@ if __name__ == '__main__':
     odomMsg = Odometry()
     odomMsg.header.frame_id ='world'
     odomMsg.child_frame_id = 'quadrotor'
+
+    RPYAnglesMsg = RPYAngles()
     
     t = rospy.get_time()
     quaternion = Quaternion()
@@ -120,9 +147,18 @@ if __name__ == '__main__':
         odomMsg.twist.twist.angular.z = quadrotor.Omega_r
         
          
+        # Roll Pitch Yaw angles msg
+        RPYAnglesMsg.header.seq = RPYAnglesMsg.header.seq + 1
+        RPYAnglesMsg.header.stamp = timeNow
+
+        RPYAnglesMsg.roll =  quadrotor.phi
+        RPYAnglesMsg.pitch =  quadrotor.theta
+        RPYAnglesMsg.yaw =  quadrotor.psi
+                
+         
         # msgs publications
         pubOdometry.publish(odomMsg)
-         
+        pubRPYAngles.publish(RPYAnglesMsg)
 
 
         integrationRate.sleep()
