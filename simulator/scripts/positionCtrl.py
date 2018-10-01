@@ -20,9 +20,9 @@ rospy.init_node('positionCtrl', anonymous=False)
 # publishers
 # -----------
 # Thrust
-pubThrust = rospy.Publisher('/thrust', Thrust, queue_size=50)
+pubThrust = rospy.Publisher('thrust', Thrust, queue_size=50)
 # Attitude angles as reference for attitude control
-pubRPYAnglesRef = rospy.Publisher('/RPYAnglesRef', RPYAngles, queue_size=50)
+pubRPYAnglesRef = rospy.Publisher('RPYAnglesRef', RPYAngles, queue_size=50)
 
 
 # control frequency

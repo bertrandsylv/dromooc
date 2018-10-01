@@ -19,7 +19,7 @@ rospy.init_node('quadrotorCtrl', anonymous=False)
 # publishers
 # -----------
 # odometry
-pubWrench = rospy.Publisher('/wrench', Wrench, queue_size=50)
+pubWrench = rospy.Publisher('wrench', Wrench, queue_size=50)
 
 
 

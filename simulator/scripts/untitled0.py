@@ -13,6 +13,7 @@ from simulator.msg import Thrust, Torque, MotorSpeeds, RPYAngles
 import quadrotorClass
 
 
+
 # node init
 rospy.init_node('quadrotorSimu', anonymous=False)
 
@@ -28,7 +29,7 @@ Gamma3 = 0.
 # publishers
 # -----------
 # odometry
-pubOdometry = rospy.Publisher('odom', Odometry, queue_size=50)
+pubOdometry = rospy.Publisher('/odom', Odometry, queue_size=50)
 pubRPYAngles = rospy.Publisher('RPYAngles', RPYAngles, queue_size=50 )
 
 

@@ -23,7 +23,7 @@ rospy.init_node('attitudeCtrl', anonymous=False)
 # publishers
 # -----------
 # Torque
-pubTorque = rospy.Publisher('/torque', Torque, queue_size=50)
+pubTorque = rospy.Publisher('torque', Torque, queue_size=50)
 
 
 # control frequency
