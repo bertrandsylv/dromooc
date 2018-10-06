@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  visualization_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -110,7 +111,7 @@ generate_dynamic_reconfigure_options(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES simulator
-  CATKIN_DEPENDS message_runtime geometry_msgs std_msgs nav_msgs roscpp rospy
+  CATKIN_DEPENDS message_runtime geometry_msgs std_msgs nav_msgs visualization_msgs roscpp rospy
 #  DEPENDS system_lib
 )
 

@@ -9,7 +9,7 @@ Panels:
         - /Grid1
         - /TF1
       Splitter Ratio: 0.5
-    Tree Height: 359
+    Tree Height: 410
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -91,6 +91,14 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /WPMarker
+      Name: Marker
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 106; 106; 106
