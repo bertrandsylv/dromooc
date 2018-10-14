@@ -202,6 +202,7 @@ if __name__ == '__main__':
             if ( np.abs(np.mod(yawRef,2.*np.pi)) == np.pi/2.):  # yaw = +/- pi/2
                 pitchRef = np.sign(yawRef) * np.arctan(Rd_e3[1] / Rd_e3[2] )
                 rollRef = np.sign(yawRef) * np.arctan( np.cos(pitchRef) *  Rd_e3[0] / Rd_e3[2] )
+                print ("yaw pi sur 2")
 
             else:
                 pitchRef = np.arctan( np.cos(yawRef)*(Rd_e3[0]/Rd_e3[2]) + np.sin(yawRef)*(Rd_e3[1]/Rd_e3[2])  )            

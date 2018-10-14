@@ -105,6 +105,10 @@ class Quadrotor:
 
             # motor speeds
             omegaSquare = np.dot( self.Binv, np.array([[T],[Gamma1], [Gamma2], [Gamma3]]))
+            if (omegaSquare[0]<0) or (omegaSquare[1]<0) or (omegaSquare[2]<0) or (omegaSquare[3]<0):
+                print (omegaSquare)
+                print inputVector
+            
             self.omega1 = np.sqrt(omegaSquare[0])
             self.omega2 = np.sqrt(omegaSquare[1])
             self.omega3 = np.sqrt(omegaSquare[2])

@@ -56,11 +56,15 @@ kd = 0.1
 # ----------------------------------------------------------------------------
 def callbackDynParam(config, level):
 # -----------------------------------------------------------------------------
-    global kp, ki, kd
+    global kp, ki, kd, kpYaw, kiYaw, kdYaw
 
     kp = float("""{Kp}""".format(**config))
     ki = float("""{Ki}""".format(**config))
     kd = float("""{Kd}""".format(**config))
+
+    kpYaw = float("""{KpYaw}""".format(**config))
+    kiYaw = float("""{KiYaw}""".format(**config))
+    kdYaw = float("""{KdYaw}""".format(**config))
 
     return config
 # -----------------------------------------------------------------------------
@@ -74,6 +78,9 @@ kp = rospy.get_param('/attitudeCtrl/Kp', 36.)
 ki = rospy.get_param('/attitudeCtrl/Ki', 0.)
 kd = rospy.get_param('/attitudeCtrl/Kd', 40.)
 
+kpYaw = rospy.get_param('/attitudeCtrl/KpYaw', 5.)
+kiYaw = rospy.get_param('/attitudeCtrl/KiYaw', 0.)
+kdYaw = rospy.get_param('/attitudeCtrl/KdYaw', 8.)
 
 
 # subscribers callbacks
@@ -141,6 +148,12 @@ if __name__ == '__main__':
         u = -kp*(eta - etaRef) -kd*(angularVel - angularVelRef)
 
         OmegaxJOmega = np.cross(angularVel.T, np.dot(quadrotor.J, angularVel).T).T
+        
+        # yaw        
+        yawErr = yaw - yawRef
+        # TO DO: COMPLETE MODULOS
+        uz = -kpYaw*(yawErr) -kdYaw*(angularVel[2] - angularVelRef[2])
+        u[2] = uz          
         
         torque = OmegaxJOmega + np.dot(quadrotor.J, u)
         
