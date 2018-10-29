@@ -199,13 +199,18 @@ if __name__ == '__main__':
 
             Rd_e3 = Tvec / T
             
-            if ( np.abs(np.mod(yawRef,2.*np.pi)) == np.pi/2.):  # yaw = +/- pi/2
-                pitchRef = np.sign(yawRef) * np.arctan(Rd_e3[1] / Rd_e3[2] )
-                rollRef = np.sign(yawRef) * np.arctan( np.cos(pitchRef) *  Rd_e3[0] / Rd_e3[2] )
-                print ("yaw pi sur 2")
-
+            #if ( np.abs(np.mod(yawRef,2.*np.pi)) == np.pi/2.):  # yaw = +/- pi/2
+            
+            # bring back yawRef in -pi,pi for test
+            yawRefTest = np.mod(yawRef, 2.*np.pi)
+            if (yawRefTest>np.pi):
+                yawRefTest = yawRefTest - 2.*np.pi
+            if (np.abs((yawRefTest - np.pi/2.))<0.001)or(np.abs((yawRefTest + np.pi/2.))<0.001):
+            #if np.abs( np.abs(np.mod(yawRef,2.*np.pi)) -np.pi - np.pi/2.)<0.01:  # yaw = +/- pi/2               
+                pitchRef = np.sign(yawRefTest) * np.arctan2(Rd_e3[1] , Rd_e3[2] )
+                rollRef = np.sign(yawRefTest) * np.arctan2( np.cos(pitchRef) *  Rd_e3[0] , Rd_e3[2] )
             else:
-                pitchRef = np.arctan( np.cos(yawRef)*(Rd_e3[0]/Rd_e3[2]) + np.sin(yawRef)*(Rd_e3[1]/Rd_e3[2])  )            
+                pitchRef = np.arctan2( np.cos(yawRef)*Rd_e3[0] + np.sin(yawRef)*Rd_e3[1], Rd_e3[2]  )            
                 rollRef = np.arctan( np.sin(pitchRef)*np.tan(yawRef) - (Rd_e3[1]*np.cos(pitchRef))/(Rd_e3[2]*np.cos(yawRef)) )
 
     

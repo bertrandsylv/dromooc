@@ -105,9 +105,9 @@ class Quadrotor:
 
             # motor speeds
             omegaSquare = np.dot( self.Binv, np.array([[T],[Gamma1], [Gamma2], [Gamma3]]))
-            if (omegaSquare[0]<0) or (omegaSquare[1]<0) or (omegaSquare[2]<0) or (omegaSquare[3]<0):
-                print (omegaSquare)
-                print inputVector
+#            if (omegaSquare[0]<0) or (omegaSquare[1]<0) or (omegaSquare[2]<0) or (omegaSquare[3]<0):
+#                print (omegaSquare)
+#                print inputVector
             
             self.omega1 = np.sqrt(omegaSquare[0])
             self.omega2 = np.sqrt(omegaSquare[1])
@@ -170,8 +170,8 @@ class Quadrotor:
         self.Vz = Vit[2][0]
         
         self.theta = - np.arcsin(R[2,0])
-        self.psi = np.arctan(R[1,0]/R[0,0])
-        self.phi = np.arctan(R[2,1]/R[2,2]);
+        self.psi = np.arctan2(R[1,0],R[0,0])
+        self.phi = np.arctan2(R[2,1],R[2,2]);
         
         self.Omega_p = Omega[0][0]
         self.Omega_q = Omega[1][0]

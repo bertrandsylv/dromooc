@@ -150,8 +150,14 @@ if __name__ == '__main__':
         OmegaxJOmega = np.cross(angularVel.T, np.dot(quadrotor.J, angularVel).T).T
         
         # yaw        
-        yawErr = yaw - yawRef
-        # TO DO: COMPLETE MODULOS
+        yawErr = yawRef - yaw
+        # TO DO: COMPLETE MODULOSASSESSMENT OF THE GROUND RISK IN THE OPERATION OF SMALL UNMANNED AERIAL VEHICLES 
+        if (yawErr>np.pi):
+            yawErr = yawErr - 2.*np.pi
+        elif (yawErr<= -np.pi):
+            yawErr = yawErr + 2.*np.pi
+        yawErr = -yawErr
+        
         uz = -kpYaw*(yawErr) -kdYaw*(angularVel[2] - angularVelRef[2])
         u[2] = uz          
         

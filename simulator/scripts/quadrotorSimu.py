@@ -121,6 +121,7 @@ if __name__ == '__main__':
       
         quat = tf.transformations.quaternion_from_euler(quadrotor.phi, quadrotor.theta, quadrotor.psi)  # roll, pitch, yaw
         quaternion = Quaternion(*tf.transformations.quaternion_from_euler(quadrotor.phi, quadrotor.theta, quadrotor.psi))
+        
 
         timeNow = rospy.Time.now()
         
