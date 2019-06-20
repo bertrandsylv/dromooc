@@ -20,7 +20,7 @@
 	<node name="quadrotor_robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
 	<!-- RViz GUI -->
-    	<node name="visu" pkg="rviz" type="rviz" output="screen" args="-d $(find simulator)/viz/quadrotorSimu.rviz" />
+    	<node name="visu" pkg="rviz" type="rviz" output="screen" args="-d $(find simulator)/viz/quadrotorSimu.rviz" /> 
 
 	<!-- RQT GUI -->
     	<node name="rqt" pkg="rqt_gui" type="rqt_gui" output="screen" args="--perspective-file $(find simulator)/viz/quadrotorSimu.perspective" />
