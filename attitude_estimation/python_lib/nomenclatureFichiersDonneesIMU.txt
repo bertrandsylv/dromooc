@@ -1,0 +1,5 @@
+// Start Time: 0
+// Sample rate: 100.0Hz
+// Scenario: 0.0
+// Firmware Version: 0.0.0
+Counter	Acc_X	Acc_Y	Acc_Z	Gyr_X	Gyr_Y	Gyr_Z	Mag_X	Mag_Y	Mag_Z	Roll	Pitch	Yaw	
