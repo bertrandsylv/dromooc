@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<!-- DroMOOC
+     ONERA-ENSTA-CentraleSupelec-Paris Saclay
+     Mono drone simulator
+-->
+
+<launch>
+	<!-- Way Point Manager -->
+        <node name="WPManager" pkg="simulator" type="WPManager.py" output="screen"> </node>
+
+</launch>
+
+

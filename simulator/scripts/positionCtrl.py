@@ -94,9 +94,9 @@ def callbackDynParam(config, level):
 srv = Server(positionCtrlCFGConfig, callbackDynParam)
 
 # init dynamic parameters
-kp = rospy.get_param('/positionCtrl/Kp', 0.5)
+kp = rospy.get_param('/positionCtrl/Kp', 0.12)
 ki = rospy.get_param('/positionCtrl/Ki', 0.)
-kd = rospy.get_param('/positionCtrl/Kd', 2.3)
+kd = rospy.get_param('/positionCtrl/Kd', 0.48)
 
 
 

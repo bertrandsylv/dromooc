@@ -74,9 +74,9 @@ def callbackDynParam(config, level):
 srv = Server(attitudeCtrlCFGConfig, callbackDynParam)
 
 # init dynamic parameters
-kp = rospy.get_param('/attitudeCtrl/Kp', 36.)
+kp = rospy.get_param('/attitudeCtrl/Kp', 52.2)
 ki = rospy.get_param('/attitudeCtrl/Ki', 0.)
-kd = rospy.get_param('/attitudeCtrl/Kd', 40.)
+kd = rospy.get_param('/attitudeCtrl/Kd', 55.2)
 
 kpYaw = rospy.get_param('/attitudeCtrl/KpYaw', 5.)
 kiYaw = rospy.get_param('/attitudeCtrl/KiYaw', 0.)
