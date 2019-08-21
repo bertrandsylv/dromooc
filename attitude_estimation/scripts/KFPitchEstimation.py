@@ -31,7 +31,7 @@ pubGroundTruthRPY = rospy.Publisher('GroundTruthRPYAngles', RPYAngles, queue_siz
 
 
 # sampling period (s)
-Te = 1.0/25.0
+Te = 1.0/25.0   # IMU Frequency: 25Hz
 
 # system definition
 # state : pitch angle (rad), gyro's bias (rad/s)
@@ -76,12 +76,15 @@ magMeas = np.zeros((3,1))
 yawEstim = 0.
 pitchEstim = 0.
 rollEstim = 0.
+msgEstimatedRPY = RPYAngles()
+
 
 # ground truth
 yawGroundTruth = 0.
 pitchGroundTruth = 0.
 rollGroundTruth = 0.
 quaternionGroundTruth = Quaternion()
+msgGroundTruthRPY = RPYAngles()
 
 
 # subscribers callbacks
@@ -93,6 +96,7 @@ def callBackImuAcceleroGyro(data):
     global accMeas, gyroMeas
     global quaternionGroundTruth, pitchGroundTruth, rollGroundTruth, yawGroundTruth
     global pitchEstim, pitchKF
+    global msgEstimatedRPY, msgGroundTruthRPY
     
     #read acceleration measurements
     accMeas[0] = data.linear_acceleration.x
@@ -118,35 +122,30 @@ def callBackImuAcceleroGyro(data):
     #print((rollGroundTruth, pitchGroundTruth, yawGroundTruth))
     
     # read pitch rate measurement from gyro         
-    uk = gyroMeas[1]
+    uk = gyroMeas[1,0]
     pitchKF.predict(uk)
     
     # compute pitch measurement from accelero    
-    yk = math.atan2(-accMeas[0] , math.sqrt( math.pow(accMeas[1],2) + math.pow(accMeas[2],2) ) )
+    yk = math.atan2(-accMeas[0,0] , math.sqrt( math.pow(accMeas[1,0],2) + math.pow(accMeas[2,0],2) ) )
     pitchKF.update(yk)
 
     pitchEstim = pitchKF.xk[0,0]
     
     
-    msgEstimatedRPY = RPYAngles()
     timeNow = rospy.Time.now()
+    
     msgEstimatedRPY.header.seq = msgEstimatedRPY.header.seq + 1
     msgEstimatedRPY.header.stamp = timeNow
-    msgEstimatedRPY.roll =0. # not computed
-    msgEstimatedRPY.pitch =  pitchEstim
-    msgEstimatedRPY.yaw =  0. # not computed
-    
+    msgEstimatedRPY.roll = np.nan # not a number (not computed)
+    msgEstimatedRPY.pitch = pitchEstim
+    msgEstimatedRPY.yaw =  np.nan # not computed (not computed)
     pubEstimatedRPY.publish(msgEstimatedRPY)
 
-
-    msgGroundTruthRPY = RPYAngles()
-    timeNow = rospy.Time.now()
     msgGroundTruthRPY.header.seq = msgGroundTruthRPY.header.seq + 1
     msgGroundTruthRPY.header.stamp = timeNow
     msgGroundTruthRPY.roll = rollGroundTruth
     msgGroundTruthRPY.pitch =  pitchGroundTruth
     msgGroundTruthRPY.yaw = yawGroundTruth
-    
     pubGroundTruthRPY.publish(msgGroundTruthRPY)    
     
 # -----------------------------------------------------------------------------        
@@ -171,8 +170,6 @@ rospy.Subscriber("/imu/data", Imu, callBackImuAcceleroGyro)
 #rospy.Subscriber("/imu/mag", MagneticField, callBackImuMagneto)
 
 
-# **************************************** REPRENDRE EN DESSOUS  *************
-
 
 
 # main node loop
@@ -182,50 +179,4 @@ rospy.Subscriber("/imu/data", Imu, callBackImuAcceleroGyro)
 if __name__ == '__main__':
 # -----------------------------------------------------------------------------
     rospy.spin()    
-    #global quadrotor
-
-#    # init messages
-#    #torqueMsg = Torque()
-#    
-#    # main loop
-#    while not rospy.is_shutdown():
-#
-#        # attitude and reference        
-#        eta = np.array([[roll],[pitch],[yaw]])
-#        etaRef = np.array([[rollRef],[pitchRef],[yawRef]])
-#
-#        # PID for attitude control
-#        u = -kp*(eta - etaRef) -kd*(angularVel - angularVelRef)
-#
-#        OmegaxJOmega = np.cross(angularVel.T, np.dot(quadrotor.J, angularVel).T).T
-#        
-#        # yaw        
-#        yawErr = yawRef - yaw
-#        # TO DO: COMPLETE MODULOSASSESSMENT OF THE GROUND RISK IN THE OPERATION OF SMALL UNMANNED AERIAL VEHICLES 
-#        if (yawErr>np.pi):
-#            yawErr = yawErr - 2.*np.pi
-#        elif (yawErr<= -np.pi):
-#            yawErr = yawErr + 2.*np.pi
-#        yawErr = -yawErr
-#        
-#        uz = -kpYaw*(yawErr) -kdYaw*(angularVel[2] - angularVelRef[2])
-#        u[2] = uz          
-#        
-#        torque = OmegaxJOmega + np.dot(quadrotor.J, u)
-#        
-#        # msgs update        
-#        timeNow = rospy.Time.now()
-#        torqueMsg.header.seq += 1
-#        torqueMsg.header.stamp = timeNow     
-#        torqueMsg.torque.x = torque[0]        
-#        torqueMsg.torque.y = torque[1]
-#        torqueMsg.torque.z = torque[2]
-#        
-#        
-#        # msgs publications
-#        pubTorque.publish(torqueMsg)
-#         
-#
-#        rate.sleep()
-
 # -----------------------------------------------------------------------------
