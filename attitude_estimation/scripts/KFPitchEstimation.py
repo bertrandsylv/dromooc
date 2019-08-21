@@ -50,7 +50,7 @@ gyroPitchRateBiasStdDev = 0.00005  # (rad/s)
 acceleroPitchStdDev = 0.01  # (rad)
 # cov matrices
 Qk = Te * np.array( [ [math.pow(gyroPitchRateStdDev,2), 0.0], [0.0, math.pow(gyroPitchRateBiasStdDev,2)] ] )
-Rk = 0.001*np.array([math.pow(acceleroPitchStdDev,2)])
+Rk = np.array([math.pow(acceleroPitchStdDev,2)])
 
 # initial state and covariance
 x0 = np.array([ [0.0],[-0.006] ])
