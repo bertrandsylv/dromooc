@@ -97,6 +97,8 @@ def callBackImuAcceleroGyro(data):
     global accMeas, gyroMeas
     global quaternionGroundTruth, pitchGroundTruth, rollGroundTruth, yawGroundTruth
     global pitchEstim, pitchKF
+    global rollEstim
+    #global msgEstimatedRPY, msgGroundTruthRPY
     
     #read acceleration measurements
     accMeas[0] = data.linear_acceleration.x
@@ -130,30 +132,38 @@ def callBackImuAcceleroGyro(data):
     pitchKF.update(yk)
 
     pitchEstim = pitchKF.xk[0,0]
+
+
+    rollEstim = 0.    
     
-    
-      
+
     
 # -----------------------------------------------------------------------------        
 
 
 
-## -----------------------------------------------------------------------------
-#def callBackImuMagneto(data):
-## -----------------------------------------------------------------------------
-#    global magMeas
-#    
-#    magMeas[0] = data.magnetic_field.x
-#    magMeas[1] = data.magnetic_field.y
-#    magMeas[2] = data.magnetic_field.z
-#    #print(magMeas)
-## -----------------------------------------------------------------------------        
+# -----------------------------------------------------------------------------
+def callBackImuMagneto(data):
+# -----------------------------------------------------------------------------
+    global magMeas
+    global yawEstim
+    
+    magMeas[0] = data.magnetic_field.x
+    magMeas[1] = data.magnetic_field.y
+    magMeas[2] = data.magnetic_field.z
+    
+    
+    yawEstim = math.atan2(-magMeas[1], magMeas[0])    
+    
+    
+    #print(magMeas)
+# -----------------------------------------------------------------------------        
 
           
 # subscribers
 # ------------
 rospy.Subscriber("/imu/data", Imu, callBackImuAcceleroGyro)
-#rospy.Subscriber("/imu/mag", MagneticField, callBackImuMagneto)
+rospy.Subscriber("/imu/mag", MagneticField, callBackImuMagneto)
 
 
 
@@ -172,9 +182,9 @@ if __name__ == '__main__':
     
         msgEstimatedRPY.header.seq = msgEstimatedRPY.header.seq + 1
         msgEstimatedRPY.header.stamp = timeNow
-        msgEstimatedRPY.roll = np.nan # not a number (not computed)
+        msgEstimatedRPY.roll = rollEstim
         msgEstimatedRPY.pitch = pitchEstim
-        msgEstimatedRPY.yaw =  np.nan # not computed (not computed)
+        msgEstimatedRPY.yaw =  yawEstim
         pubEstimatedRPY.publish(msgEstimatedRPY)
     
         msgGroundTruthRPY.header.seq = msgGroundTruthRPY.header.seq + 1
@@ -182,7 +192,8 @@ if __name__ == '__main__':
         msgGroundTruthRPY.roll = rollGroundTruth
         msgGroundTruthRPY.pitch =  pitchGroundTruth
         msgGroundTruthRPY.yaw = yawGroundTruth
-        pubGroundTruthRPY.publish(msgGroundTruthRPY)  
+        pubGroundTruthRPY.publish(msgGroundTruthRPY)    
         
         IMURate.sleep()
+
 # -----------------------------------------------------------------------------
