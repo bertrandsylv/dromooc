@@ -9,8 +9,6 @@ import rospy
 from attitude_estimation.msg import RPYAngles
 from geometry_msgs.msg import Quaternion
 from sensor_msgs.msg import Imu, MagneticField
-from dynamic_reconfigure.server import Server
-from attitude_estimation.cfg import KFPitchCFGConfig
 import tf
 import numpy as np
 import math
@@ -47,70 +45,24 @@ Ak = np.array( [[1.0, -Te],[0.0,1.0]] )
 Bk = np.array( [ [Te],[0.0] ] )
 Ck = np.array( [[1.0, 0.0]] )
     
-
-
-# filter instantiation
-pitchKF = kf.KalmanFilter(nx, nu, ny)
-pitchKF.setStateEquation(Ak, Bk)
-pitchKF.setCk(Ck)
-
-
-
-''' dynamic parameters '''
-'''
-# noises std devs
+# noises std dev
 gyroPitchRateStdDev = 0.0065 #0.0065*0.0065  # (rad/s)
 gyroPitchRateBiasStdDev = 0.00005  # (rad/s)
 acceleroPitchStdDev = 0.01  # (rad)
 # cov matrices
 Qk = Te * np.array( [ [math.pow(gyroPitchRateStdDev,2), 0.0], [0.0, math.pow(gyroPitchRateBiasStdDev,2)] ] )
 Rk = np.array([math.pow(acceleroPitchStdDev,2)])
-'''
-
-# ----------------------------------------------------------------------------
-def callbackDynParam(config, level):
-# -----------------------------------------------------------------------------
-
-    global gyroPitchRateStdDev, gyroPitchRateBiasStdDev, acceleroPitchStdDev
-    global Qk, Rk, pitchKF
-
-    gyroPitchRateStdDev = float("""{GyroPitchRateStdDev}""".format(**config))
-    gyroPitchRateBiasStdDev = float("""{GyroPitchRateBiasStdDev}""".format(**config))
-    acceleroPitchStdDev = float("""{AcceleroPitchStdDev}""".format(**config))
-    
-    Qk = Te * np.array( [ [math.pow(gyroPitchRateStdDev,2), 0.0], [0.0, math.pow(gyroPitchRateBiasStdDev,2)] ] )
-    Rk = np.array([math.pow(acceleroPitchStdDev,2)])
-    
-    pitchKF.setQk(Qk)
-    pitchKF.setRk(Rk)
-    
-   
-
-    return config
-# -----------------------------------------------------------------------------
-
-
-# server for dyamic parameters
-srv = Server(KFPitchCFGConfig, callbackDynParam)
-
-# init dynamic parameters
-gyroPitchRateStdDev = rospy.get_param('/KFPitchEstimation/GyroPitchRateStdDev', 0.0065)
-gyroPitchRateBiasStdDev = rospy.get_param('/KFPitchEstimation/GyroPitchRateBiasStdDev', 0.00005)
-acceleroPitchStdDev = rospy.get_param('/KFPitchEstimation/AcceleroPitchStdDev', 0.01)
-
-# compute and set covariance matrices of noises
-Qk = Te * np.array( [ [math.pow(gyroPitchRateStdDev,2), 0.0], [0.0, math.pow(gyroPitchRateBiasStdDev,2)] ] )
-Rk = np.array([math.pow(acceleroPitchStdDev,2)])
-    
-pitchKF.setQk(Qk)
-pitchKF.setRk(Rk)
-
-
 
 # initial state and covariance
 x0 = np.array([ [0.0],[-0.006] ])
 P0 = np.array( [ [0.5,0.0],[0.0,0.1] ] )  
-
+    
+# filter instantiation
+pitchKF = kf.KalmanFilter(nx, nu, ny)
+pitchKF.setStateEquation(Ak, Bk)
+pitchKF.setCk(Ck)
+pitchKF.setQk(Qk)
+pitchKF.setRk(Rk)
 pitchKF.initFilter( x0 , P0 )
 
  

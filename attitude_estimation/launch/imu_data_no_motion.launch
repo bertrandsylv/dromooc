@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<!-- DroMOOC
+     ONERA-ENSTA-CentraleSupelec-Paris Saclay
+     Vizualisation of IMU data
+-->
+
+<launch>
+
+	<!-- bag -->
+        <node name="replay" pkg="rosbag" type="play" output="screen" args="-l $(find attitude_estimation)/bags/no_motion.bag" />
+
+	<!-- RQT GUI -->
+    	<node name="rqt" pkg="rqt_gui" type="rqt_gui" output="screen" args="--perspective-file $(find attitude_estimation)/viz/imu_data.perspective" />
+
+
+</launch>
+
+
