@@ -8,7 +8,7 @@
 <launch>
 
 	<!-- bag -->
-        <node name="data_replay" pkg="rosbag" type="play" output="screen" args="-l $(find attitude_estimation)/bags/no_motion.bag" />
+        <node name="data_replay" pkg="rosbag" type="play" output="screen" args="-l $(find attitude_estimation)/bags/pitch_only.bag" />
 
 	<!-- RQT GUI -->
     	<node name="visu_accelero_gyro" pkg="rqt_gui" type="rqt_gui" output="screen" args="--perspective-file $(find attitude_estimation)/viz/imu_accelero_gyro.perspective" />
