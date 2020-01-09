@@ -64,12 +64,11 @@ class Quadrotor:
     
 
 
-    def stateUpdateFromInput(self, inputVector, inputType = 'ThrustAndTorques', Ts=0.001):
+    def stateUpdateFromInput(self, inputVector, inputType = 'ThrustAndTorques', FextVector=[0., 0., 0.], Ts=0.001):
     # inputType : 'motorSpeed', 'thrustAndTorques'
     
-        ''' A METTRE EN ENTREE '''
         # perturbation force in inertial frame
-        Fext = np.array([[0.],[0.],[0.]])
+        Fext = np.array( [ [FextVector[0]], [FextVector[1]], [FextVector[2]] ] )
         
         
 

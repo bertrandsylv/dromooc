@@ -9,7 +9,7 @@ import rospy
 import tf
 from geometry_msgs.msg import Quaternion#, Wrench
 from nav_msgs.msg import Odometry
-from simulator.msg import Thrust, Torque, MotorSpeeds, RPYAngles
+from simulator.msg import Thrust, Force, Torque, MotorSpeeds, RPYAngles
 import quadrotorClass
 
 
@@ -24,6 +24,9 @@ T = quadrotor.g0 * quadrotor.m
 Gamma1 = 0.
 Gamma2 = 0.
 Gamma3 = 0.
+Fext_x = 0.
+Fext_y = 0.
+Fext_z = 0.
 
 
 
@@ -71,8 +74,23 @@ def callBackTorque(data):
     Gamma1 = data.torque.x
     Gamma2 = data.torque.y
     Gamma3 = data.torque.z
-            
 # -----------------------------------------------------------------------------        
+
+
+
+# -----------------------------------------------------------------------------
+def callBackFext(data):
+# -----------------------------------------------------------------------------
+    global Fext_x, Fext_y, Fext_z
+    
+    Fext_x = data.force.x
+    Fext_y = data.force.y
+    Fext_z = data.force.z
+# -----------------------------------------------------------------------------        
+
+
+
+
 
 
 '''
@@ -94,6 +112,7 @@ def callBackWrench(data):
 #rospy.Subscriber("inputWrench", Wrench, callBackWrench)
 rospy.Subscriber("thrust", Thrust, callBackThrust)
 rospy.Subscriber("torque", Torque, callBackTorque)
+rospy.Subscriber("Fext", Force, callBackFext)
 
 
 
@@ -116,13 +135,12 @@ if __name__ == '__main__':
     quaternion = Quaternion()
 
     while not rospy.is_shutdown():
-        quadrotor.stateUpdateFromInput([T, Gamma1, Gamma2, Gamma3], inputType=inputMode, Ts=Tint)
-        # time
-      
+        quadrotor.stateUpdateFromInput([T, Gamma1, Gamma2, Gamma3], inputType=inputMode, FextVector=[Fext_x, Fext_y, Fext_z], Ts=Tint)
+        
         quat = tf.transformations.quaternion_from_euler(quadrotor.phi, quadrotor.theta, quadrotor.psi)  # roll, pitch, yaw
         quaternion = Quaternion(*tf.transformations.quaternion_from_euler(quadrotor.phi, quadrotor.theta, quadrotor.psi))
         
-
+        # time
         timeNow = rospy.Time.now()
         
         # broadcast TF

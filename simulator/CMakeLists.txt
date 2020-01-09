@@ -55,6 +55,7 @@ add_message_files(
    RPYAngles.msg
    Thrust.msg
    Torque.msg
+   Force.msg
    WayPoint.msg
    Angle.msg
 )
